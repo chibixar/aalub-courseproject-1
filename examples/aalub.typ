@@ -1,0 +1,1 @@
+#import "@local/typst-bsuir-core:0.2.0": *

@@ -192,6 +192,28 @@
     ))
 }
 
+#let node-better(name, pos, visible: false, radius: 0.12, fill: black, ..params) = {
+    import zap: cetz, node
+
+    let named = params.named()
+
+    // 1. Обрабатываем якоря (top, bottom, left, right)
+    let lbl = named.at("label", default: none)
+    if type(lbl) == dictionary and "anchor" in lbl {
+        lbl.anchor = phys-to-anchor(0deg, lbl.anchor)
+        named.label = lbl
+    }
+
+    // 2. Вызываем стандартный узел zap, но ЖЕСТКО делаем его невидимым
+    node(name, pos, stroke: none, fill: false, radius: 0.0000001, ..named)
+
+    // 3. Если узел должен быть видимым — рисуем поверх него свой кружок
+    // с нужным нам радиусом и цветом
+    if visible {
+        cetz.draw.circle(name, radius: radius, fill: fill, stroke: none)
+    }
+}
+
 // EXAMPLE
 #circuit-better(scale-factor: 80%, {
     import zap: *
@@ -200,12 +222,12 @@
 //     set-style(wire: (stroke: (thickness: 1.2pt)))
 //     set-style(resistor: (width: 1.6, height: 0.5))
 
-    node("e", (0, 3.5), label: (content: "e", anchor: "west"))
-    node("a", (5, 7), label: (content: "a", anchor: "north"))
-    node("б", (11, 7), label: (content: "б", anchor: "north"))
-    node("в", (16, 3.5), label: (content: "в", anchor: "east"))
-    node("д", (5, 0), label: (content: "д", anchor: "south"))
-    node("г", (11, 0), label: (content: "г", anchor: "south"))
+    node-better("e", (0, 3.5), label: (content: "e", anchor: "west"), visible: true)
+    node-better("a", (5, 7), label: (content: "a", anchor: "north"), visible: true)
+    node-better("б", (11, 7), label: (content: "б", anchor: "north"), visible: true)
+    node-better("в", (16, 3.5), label: (content: "в", anchor: "east"), visible: true)
+    node-better("д", (5, 0), label: (content: "д", anchor: "south"), visible: true)
+    node-better("г", (11, 0), label: (content: "г", anchor: "south"), visible: true)
 
     // Notice how intuitive this becomes: you just ask for the physical "left", "right", "top", "bottom"
     // Left Branch (UP):

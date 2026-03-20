@@ -36,5 +36,6 @@
 * more aalub cource project functions
 * second toec lab
 * for toec, make R_i and other inputs (and values) with const variable and calculate everything inline, without raw numbers in equations
+* make separate dependencies.typ file
 * add licence file
 * publish package

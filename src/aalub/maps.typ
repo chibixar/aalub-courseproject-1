@@ -67,7 +67,7 @@
   for (r, row) in grid-data.enumerate() {
     cells.push(move(format-cell(y-labels.at(r)), dx: 0.5em))
     for val in row {
-      if val == 2 { cells.push(move(format-cell("*"), dy: 0.2em)) }
+      if val == 2 { cells.push(move(format-cell(strong(text(size: 15pt, "*"))), dy: 0.4em)) }
       else if val == hide { cells.push(format-cell([])) }
       else { cells.push(format-cell(val)) }
     }
@@ -124,7 +124,7 @@
   let cells = ()
   for row in grid-data {
     for val in row {
-      if val == 2 { cells.push(move(format-cell("*"), dy: 0.2em)) }
+      if val == 2 { cells.push(move(format-cell(strong(text(size: 15pt, "*"))), dy: 0.4em)) }
       else if val == hide { cells.push(format-cell([])) }
       else { cells.push(format-cell(val)) }
     }

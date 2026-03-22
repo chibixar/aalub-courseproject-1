@@ -50,22 +50,29 @@
   if vars-label != none {
     cells.push(
       box(width: 100%, height: 100%)[
-        // Диагональная линия, немного укорочена для эстетики
+        // Диагональная линия
         #place(line(start: (0%, 0%), end: (100%, 100%), stroke: 0.5pt))
 
-        // Переменные вращаются на 45 градусов и симметрично размещаются
-        // относительно центра ячейки для идеального баланса.
-        #place(center, dx: -0.7em, dy: 0.7em, rotate(45deg, vars-label.at(0)))
-        #place(center, dx: 0.2em, dy: 0em, rotate(45deg, vars-label.at(1)))
+        // Переменные вращаются на 45 градусов, чтобы идти вдоль линии.
+        // dx и dy смещают их ровно перпендикулярно от линии в обе стороны
+        #place(center + horizon, dx: -0.4em, dy: 0.4em, rotate(45deg)[#vars-label.at(0)])
+        #place(center + horizon, dx: 0.4em, dy: -0.4em, rotate(45deg)[#vars-label.at(1)])
       ]
     )
   } else {
     cells.push([])
   }
 
-  for label in x-labels { cells.push(move(format-cell(label), dy: 0.5em)) }
+  // Верхняя ось (с отступом снизу, чтобы не наезжать на границу)
+  for label in x-labels { 
+    cells.push(box(width: 100%, height: 100%, align(center + bottom, pad(bottom: 0.3em)[#label]))) 
+  }
+  
   for (r, row) in grid-data.enumerate() {
-    cells.push(move(format-cell(y-labels.at(r)), dx: 0.5em))
+    // Левая ось (с отступом справа, чтобы не наезжать на границу)
+    cells.push(box(width: 100%, height: 100%, align(right + horizon, pad(right: 0.4em)[#y-labels.at(r)])))
+    
+    // Внутренние данные таблицы
     for val in row {
       if val == 2 { cells.push(move(format-cell(strong(text(size: 15pt, "*"))), dy: 0.4em)) }
       else if val == hide { cells.push(format-cell([])) }
@@ -213,16 +220,8 @@
 
       // Нижняя линия p начинается с 1 колонки и длится 2 колонки
       (side: "bottom", start: 1, span: 2, label: $p$, offset: 0.6em),
-
-      /* Пример: Если вам нужна переменная, разорванная на две части
-         просто добавьте два объекта!
-      (side: "top", start: 0, span: 1, label: $x$, offset: 2em),
-      (side: "top", start: 3, span: 1, label: $x$, offset: 2em),
-      */
     ),
 
-    // Группировки работают точно так же, только
-    // координаты (r, c) теперь совпадают с индексами массива grid-data
     groups: (
       (r: 0, c: 0, w: 2, h: 1, color: rgb("#4a7bbb"), pad: 4pt),
       (r: 0, c: 1, w: 2, h: 1, color: rgb("#92d050"), pad: 6pt),
@@ -256,6 +255,37 @@
       (r: 2, c: 0, w: 4, h: 1, color: rgb("#ffc000"), pad: 2pt),
       (r: 2, c: 1, w: 2, h: 1, color: rgb("#00b050"), pad: 5pt),
       (r: 2, c: 5, w: 2, h: 1, color: rgb("#00b050"), pad: 5pt),
+    )
+  )
+]
+
+// --- NEW ADDITION ---
+
+#align(center)[
+  #karnaugh-map(
+    x-labels: ("000", "001", "011", "010", "110", "111", "101", "100"),
+    y-labels: ("000", "001", "011", "010", "110", "111", "101", "100"),
+    hide: none,
+    // Убрал rotate(-45deg), так как функция теперь сама красиво поворачивает переменные вдоль линии
+    vars-label: ($P_1 x_1 x_2$, $y_1 y_2 h$),
+    cell-size: 2.2em,
+    grid-data: (
+      ("1", "0", "0", "0", "x", "x", "0", "1"),
+      ("1", "0", "0", "0", "x", "x", "0", "1"),
+      ("1", "1", "1", "1", "x", "x", "1", "1"),
+      ("1", "1", "1", "1", "x", "x", "1", "1"),
+      ("x", "x", "x", "x", "x", "x", "x", "0"),
+      ("x", "x", "x", "x", "x", "x", "x", "0"),
+      ("x", "x", "x", "x", "x", "x", "x", "0"),
+      ("x", "x", "x", "x", "x", "x", "x", "0")
+    ),
+    groups: (
+      (r: 0, c: 0, w: 1, h: 2, color: black, pad: 2pt),
+      (r: 2, c: 0, w: 4, h: 2, color: black, pad: 2pt),
+      (r: 4, c: 0, w: 1, h: 4, color: black, pad: 2pt),
+      (r: 0, c: 7, w: 1, h: 2, color: black, pad: 2pt),
+      (r: 2, c: 7, w: 1, h: 2, color: black, pad: 2pt),
+      (r: 0, c: 4, w: 1, h: 6, color: black, pad: 2pt),
     )
   )
 ]

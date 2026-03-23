@@ -69,14 +69,10 @@
 
         let named = params.named()
 
-        let lbl = named.at("label", default: none)
-        if type(lbl) == dictionary and "anchor" in lbl {
-            lbl.anchor = phys-to-anchor(angle, lbl.anchor)
-            named.label = lbl
-        }
-
-        let arrow-dir = phys-to-x(angle, named.at("arrow-dir", default: "forward"))
-        let _ = named.remove("arrow-dir", default: none)
+        // 1. ИЗВЛЕКАЕМ label, чтобы zap его не рисовал
+        let lbl = named.remove("label", default: none)
+        // ИЗВЛЕКАЕМ направление стрелки ЭДС
+        let arrow-dir = phys-to-x(angle, named.remove("arrow-dir", default: "forward"))
 
         let draw(ctx, position, style) = {
             import zap: interface, cetz
@@ -88,6 +84,31 @@
             let start-x = -arrow-dir * arrow-len
             let end-x = arrow-dir * arrow-len
             cetz.draw.line((start-x, 0), (end-x, 0), stroke: style.stroke, mark: (end: ">", fill: style.stroke.paint, scale: 1.2))
+
+            // 2. СВОЯ ОТРИСОВКА МЕТКИ
+            if lbl != none {
+                let text-content = if type(lbl) == dictionary { lbl.content } else { lbl }
+                let anchor-dir = if type(lbl) == dictionary { lbl.at("anchor", default: "top") } else { "top" }
+                // Позволяет настраивать отступ через distance (по умолчанию 0.9 для источника)
+                let dist = if type(lbl) == dictionary { lbl.at("distance", default: 0.9) } else { 0.9 }
+
+                // Превращаем физическое направление в векторы (X, Y)
+                let (p-dx, p-dy) = if anchor-dir in ("top", "north", "up") { (0, 1) }
+                              else if anchor-dir in ("bottom", "south", "down") { (0, -1) }
+                              else if anchor-dir in ("right", "east") { (1, 0) }
+                              else if anchor-dir in ("left", "west") { (-1, 0) }
+                              else { (0, 1) }
+
+                // Переводим глобальный физический вектор в локальные повернутые координаты компонента
+                let l-dx = p-dx * calc.cos(-angle) - p-dy * calc.sin(-angle)
+                let l-dy = p-dx * calc.sin(-angle) + p-dy * calc.cos(-angle)
+
+                cetz.draw.content(
+                    (l-dx * dist, l-dy * dist),
+                    box(fill: white, inset: 1pt)[#text-content],
+                    anchor: "center",
+                )
+            }
         }
 
         component("isource", name, ..pos, draw: draw, ..named)
@@ -108,21 +129,12 @@
 
         let named = params.named()
 
-        let lbl = named.at("label", default: none)
-        if type(lbl) == dictionary and "anchor" in lbl {
-            lbl.anchor = phys-to-anchor(angle, lbl.anchor)
-            named.label = lbl
-        }
-
-        let arrow-side = phys-to-y(angle, named.at("arrow-side", default: "top"))
-        let arrow-dir = phys-to-x(angle, named.at("arrow-dir", default: "right"))
-        let arrow-label = named.at("arrow-label", default: none)
-        let arrow-offset = named.at("arrow-offset", default: 0.5)
-
-        let _ = named.remove("arrow-side", default: none)
-        let _ = named.remove("arrow-dir", default: none)
-        let _ = named.remove("arrow-label", default: none)
-        let _ = named.remove("arrow-offset", default: none)
+        // 1. ИЗВЛЕКАЕМ параметры, чтобы zap на них не ругался
+        let lbl = named.remove("label", default: none)
+        let arrow-side = phys-to-y(angle, named.remove("arrow-side", default: "top"))
+        let arrow-dir = phys-to-x(angle, named.remove("arrow-dir", default: "right"))
+        let arrow-label = named.remove("arrow-label", default: none)
+        let arrow-offset = named.remove("arrow-offset", default: 0.5)
 
         let draw(ctx, position, style) = {
             import zap: interface, cetz
@@ -132,6 +144,7 @@
             interface((-w/2, -h/2), (w/2, h/2), io: position.len() < 2)
             cetz.draw.rect((-w/2, -h/2), (w/2, h/2), fill: style.fill, stroke: style.stroke)
 
+            // СТРЕЛКА ТОКА И ЕЕ МЕТКА
             if arrow-label != none {
                 let y = arrow-side * arrow-offset
                 let arrow-len = w * 0.8
@@ -144,18 +157,62 @@
                     mark: (end: ">", fill: style.stroke.paint)
                 )
 
-                let label_offset = arrow-side * 0.5
+                let label_offset = arrow-side * 0.4
                 cetz.draw.content(
                     (0, y + label_offset),
                     box(fill: white, inset: 1pt)[#arrow-label],
                     anchor: "center",
-//                     angle: -angle // Counter-rotates text so it is always upright
+                )
+            }
+
+            // МЕТКА РЕЗИСТОРА (R1, R2...)
+            if lbl != none {
+                let text-content = if type(lbl) == dictionary { lbl.content } else { lbl }
+                let anchor-dir = if type(lbl) == dictionary { lbl.at("anchor", default: "top") } else { "top" }
+                // Позволяет настраивать отступ (по умолчанию 0.7 для резистора)
+                let dist = if type(lbl) == dictionary { lbl.at("distance", default: 0.7) } else { 0.7 }
+
+                //лютый костыль todo: более умно считать
+                if calc.abs(calc.cos(angle.rad())) <= 0.01 or calc.abs(calc.sin(angle.rad())) <= 0.01 {dist /= 1.4}
+
+                let (p-dx, p-dy) = if anchor-dir in ("top", "north", "up") { (0, 1) }
+                              else if anchor-dir in ("bottom", "south", "down") { (0, -1) }
+                              else if anchor-dir in ("right", "east") { (1, 0) }
+                              else if anchor-dir in ("left", "west") { (-1, 0) }
+                              else { (0, 1) }
+
+
+                let l-dx = p-dx * calc.cos(-angle) / 3 - p-dy * calc.sin(-angle) / 2 // кофициенты - лютый костыль todo: более умно считать
+                let l-dy = p-dx * calc.sin(-angle) * 1.4 + p-dy * calc.cos(-angle) * 1.3
+
+                cetz.draw.content(
+                    (l-dx * dist, l-dy * dist),
+                    box(fill: white, inset: 1pt)[#text-content],
+                    anchor: "center",
                 )
             }
         }
 
         component("resistor", name, ..pos, draw: draw, ..named)
     })
+}
+
+#let ground-better(node-name, length: 1.2, spacing: 0.2, stroke: 1pt) = {
+  import zap: cetz, wire
+  cetz.draw.get-ctx(ctx => {
+      let (ctx, pos) = cetz.coordinate.resolve(ctx, node-name)
+      let (x, y, z) = pos
+
+      wire(pos, (x, y - 0.5)) // Провод вниз от узла
+
+      let start_x = x - length / 2
+      let end_x = x + length / 2
+      let base_y = y - 0.5
+
+      cetz.draw.line((start_x, base_y), (end_x, base_y), stroke: stroke)
+      cetz.draw.line((start_x + spacing, base_y - spacing), (end_x - spacing, base_y - spacing), stroke: stroke)
+      cetz.draw.line((start_x + 2*spacing, base_y - 2*spacing), (end_x - 2*spacing, base_y - 2*spacing), stroke: stroke)
+  })
 }
 
 // Wrapper function for customized Zap circuits
@@ -251,4 +308,35 @@
 
     // Bottom Branch (LEFT, from г to д):
     resistor-better("R6", "г", "д", label: (content: $R_6$, anchor: "bottom"), arrow-label: $I_6$, arrow-side: "top", arrow-dir: "left")
+})
+
+
+#circuit-better(scale-factor: 80%, {
+  import zap: *
+
+  node-better("1", (0, -1), label: (content: "1", anchor: "west"), visible: true)
+  node-better("3", (16, -1), label: (content: "3", anchor: "east"), visible: true)
+  node-better("2", (8, 9), label: (content: "2", anchor: "north"), visible: true)
+  node-better("4", (8, 3), label: (content: "4", anchor: "north-west"), visible: true)
+
+  node-better("5", (4, 1), visible: false) // скрыл вспомогательные узлы
+  node-better("6", (12, 1), visible: false) // скрыл вспомогательные узлы
+
+  // Внешний контур
+  resistor-better("R1", "1", "2", label: (content: $R_1$, anchor: "right"), arrow-label: $I_1$, arrow-side: "left", arrow-dir: "forward")
+  resistor-better("R5", "2", "3", label: (content: $R_5$, anchor: "left"), arrow-label: $I_5$, arrow-side: "right", arrow-dir: "forward")
+  resistor-better("R3", "1", "3", label: (content: $R_3$, anchor: "bottom"), arrow-label: $I_3$, arrow-side: "top", arrow-dir: "forward")
+
+  // Внутренняя звезда
+  resistor-better("R6", "2", "4", label: (content: $R_6$, anchor: "right"), arrow-label: $I_6$, arrow-side: "left", arrow-dir: "forward")
+
+  // Ветвь 4-1 (с E2)
+  resistor-better("R2", "4", "5", label: (content: $R_2$, anchor: "top"))
+  source-better("E2", "5", "1", position: 15%, arrow-dir: "forward", label: (content: $E_2$, anchor: "bottom"))
+
+  // Ветвь 4-3 (с E4)
+  resistor-better("R4", "4", "6", label: (content: $R_4$, anchor: "top"))
+  source-better("E4", "6", "3", position: 15%, arrow-dir: "forward", label: (content: $E_4$, anchor: "bottom"))
+
+  ground-better("3", length: 1.2, spacing: 0.2)
 })

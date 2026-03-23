@@ -259,7 +259,6 @@
   )
 ]
 
-// --- NEW ADDITION ---
 
 #align(center)[
   #karnaugh-map(

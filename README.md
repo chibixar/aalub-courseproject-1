@@ -20,7 +20,8 @@
 * now use can use it with ``#import "@local/typst-bsuir-core:x.x.x": *``
 
 ## Projects with typst-bsuir-core:
-* [ТЭЦ, Лабораторная работа №1 (Исследование цепи постоянного тока методом наложения)](https://github.com/vetolet/toec-lab1)
+* [ТЭЦ, Лабораторная работа №1 (Исследование цепи постоянного тока методом наложения)](https://github.com/slavita256bit/toec-lab1)
+* [ТЭЦ, Лабораторная работа №2 (Исследование цепи постоянного тока методом узловых потенциалов и методом эквивалентного генератора)](https://github.com/slavita256bit/toec-lab2)
 
 ## Dependencies (and thanks to):
 * gost: [modern-g7-32](https://github.com/typst-gost/modern-g7-32)

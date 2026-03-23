@@ -13,10 +13,8 @@
 
 ## Build locally:
 * install [utpm 3.0.0](https://github.com/typst-community/utpm) (you have to build it yourself)
-* ```shell
-    utpm prj bump x.x.x
-    utpm prj link
-  ```
+* ``utpm prj bump x.x.x`` (if you have changed the code and want a new version)
+* ``utpm prj link``
 * now use can use it with ``#import "@local/typst-bsuir-core:x.x.x": *``
 
 ## Projects with typst-bsuir-core:

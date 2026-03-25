@@ -229,6 +229,19 @@
   )
 ]
 
+#let gray-code(n) = {
+  if n == 0 { return ("") }
+  if n == 1 { return ("0", "1") }
+
+  let prev = gray-code(n - 1)
+  // Прямой порядок с добавлением "0" в начало
+  let top = prev.map(x => "0" + x)
+  // Обратный порядок с добавлением "1" в начало
+  let bot = prev.rev().map(x => "1" + x)
+
+  return top + bot
+}
+
 #align(center)[
   #karnaugh-map(
     x-labels: ("000", "001", "011", "010", "110", "111", "101", "100"),

@@ -1,15 +1,21 @@
-#import "@local/typst-bsuir-core:0.9.17": *
-#import "codes.typ": *
+#import "dependencies.typ": *
 
 #let ochs-table(body) = [
 
   = Таблица истинности ОЧC
 
-  #let raw-ochs = generate-base-ochs(mask-b-vals: (2, 3))
+  #encoding-as-text(code-custom)
+
+  // ОПРЕДЕЛЯЕМ ПРАВИЛО МАСКИ
+  // Для ОЧС 1-го типа: b не может быть 2 или 3.
+  #let ochs-mask = (a, b, p) => (b == 2 or b == 3)
+
+  #let raw-ochs = generate-base-ochs(mask-fn: ochs-mask)
 
   #let schema-ochs = (code-custom, code-custom, none, none, code-custom, none)
-
   #let encoded-ochs = encode-tt(raw-ochs, schema-ochs)
+
+  #let encoded-ochs = sort-tt(encoded-ochs, sort-cols: (0, 1, 2, 3, 4))
 
   #draw-truth-table(
     // Настраиваем жирные линии как на скрине

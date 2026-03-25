@@ -6,7 +6,7 @@
   "3": "11"
 )
 
-// Какая-нибудь хитрая кодировка по вашему варианту
+// Какая-нибудь хитрая кодировка варианту
 #let code-custom = (
   "0": "11",
   "1": "00",
@@ -15,4 +15,4 @@
 )
 
 // for test
-#let code-custom = code-standart
+// #let code-custom = code-standart

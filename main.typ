@@ -1,4 +1,4 @@
-#import "@local/typst-bsuir-core:0.9.14": *
+#import "dependencies.typ": *
 #import "ochs-table.typ": ochs-table
 
 #show: ochs-table

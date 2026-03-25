@@ -50,15 +50,16 @@
 #let draw-truth-table(
   headers: (),
   rows: (),
-  bold-vlines: (), // Индексы столбцов, ПОСЛЕ которых нужна жирная вертикальная линия (начиная с 1)
-  bold-hlines: (), // Индексы строк, ПОСЛЕ которых нужна жирная горизонтальная линия (начиная с 1)
-  header_cols: 1,
-  show-numbers: false // Строка с нумерацией столбцов
+  bold-vlines: (), // Индексы столбцов, ПОСЛЕ которых нужна жирная вертикальная линия
+  bold-hlines: (), // Индексы строк, ПОСЛЕ которых нужна жирная горизонтальная линия
+  header_rows: 1,
+  show-numbers: false, // Строка с нумерацией столбцов
+  column-widths: auto // Массив ширин, например: (2em, 2em, 2em, 1fr) или auto
 ) = {
   let cols = rows.at(0).len()
 
   let all_cols_count = cols + 1 + int(show-numbers)
-  let all_rows_count = rows.len() + 1 + header_cols
+  let all_rows_count = rows.len() + 1 + header_rows
 
   // Генерируем жирные вертикальные и горизонтальные линии
   let vlines = bold-vlines.map(x => table.vline(x: calc.rem(x + all_cols_count, all_cols_count), stroke: 1.5pt + black))
@@ -72,9 +73,16 @@
     }
   }
 
+  // Определяем параметр колонок для таблицы
+  let table-cols = if column-widths == auto {
+    cols // Если ничего не передали, используем просто количество колонок
+  } else {
+    column-widths // Если передали массив ширин, используем его
+  }
+
   align(center)[
     #table(
-      columns: cols,
+      columns: table-cols,
       align: center + horizon,
       stroke: 0.5pt + black,
 

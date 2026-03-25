@@ -29,7 +29,39 @@
   return rows
 }
 
-// Превращает словарь в красивую строку: "0 – 00; 1 – 11; 2 – 10; 3 – 01"
-#let encoding-as-text(code-dict) = {
-  code-dict.keys().sorted().map(k => [#k – #code-dict.at(k)]).join([; ]) + "."
+// ГЕНЕРАТОР БАЗОВЫХ СТРОК ДЛЯ ОЧУ
+// Генерирует массив: (mh, mt, h, P_high, P_low, "комментарий")
+#let generate-base-ochu(mask-fn: none) = {
+  let rows = ()
+  for mh in (0, 1, 2, 3) {
+    for mt in (0, 1, 2, 3) {
+      for h in (0, 1) {
+
+        // Логика ОЧУ: умножение, либо пропуск множимого
+        let result = if h == 0 { mh * mt } else { mh }
+
+        let p_high = calc.quo(result, 4) // Старшая цифра (P1, P2)
+        let p_low = calc.rem(result, 4)  // Младшая цифра (P3, P4)
+
+        let p_high_str = str(p_high)
+        let p_low_str = str(p_low)
+
+        // Комментарий (повторяет таблицу 2.3 из методички)
+        let comment = if h == 0 {
+          str(mh) + "·" + str(mt) + "=" + str(p_high) + str(p_low)
+        } else {
+          "Выход – код «" + str(p_high) + str(p_low) + "»"
+        }
+
+        // Применяем маску (заменяем на 'x', если набор запрещенный)
+        if mask-fn != none and mask-fn(mh, mt, h) {
+          p_high_str = "x"
+          p_low_str = "x"
+        }
+
+        rows.push((str(mh), str(mt), str(h), p_high_str, p_low_str, comment))
+      }
+    }
+  }
+  return rows
 }

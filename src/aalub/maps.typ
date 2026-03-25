@@ -56,7 +56,7 @@
         // Переменные вращаются на 45 градусов, чтобы идти вдоль линии.
         // dx и dy смещают их ровно перпендикулярно от линии в обе стороны
         #place(center + horizon, dx: -0.4em, dy: 0.4em, rotate(45deg)[#vars-label.at(0)])
-        #place(center + horizon, dx: 0.4em, dy: -0.4em, rotate(45deg)[#vars-label.at(1)])
+        #place(center + horizon, dx: 0.4em, dy: -0.7em, rotate(45deg)[#vars-label.at(1)])
       ]
     )
   } else {

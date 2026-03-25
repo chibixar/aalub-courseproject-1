@@ -18,8 +18,11 @@
 * now use can use it with ``#import "@local/typst-bsuir-core:x.x.x": *``
 
 ## Projects with typst-bsuir-core:
-* [ТЭЦ, Лабораторная работа №1 (Исследование цепи постоянного тока методом наложения)](https://github.com/slavita256bit/toec-lab1)
-* [ТЭЦ, Лабораторная работа №2 (Исследование цепи постоянного тока методом узловых потенциалов и методом эквивалентного генератора)](https://github.com/slavita256bit/toec-lab2)
+* ТЭЦ
+  * [Лабораторная работа №1 (Исследование цепи постоянного тока методом наложения)](https://github.com/slavita256bit/toec-lab1)
+  * [Лабораторная работа №2 (Исследование цепи постоянного тока методом узловых потенциалов и методом эквивалентного генератора)](https://github.com/slavita256bit/toec-lab2)
+* АИЛОЦУ
+  * [Курсовая работа, КИ, 2 семестр](https://github.com/slavita256bit/aalub-courseproject-1) (IN PROGRESS)
 
 ## Dependencies (and thanks to):
 * gost: [modern-g7-32](https://github.com/typst-gost/modern-g7-32)
@@ -32,9 +35,7 @@
 * [utpm](https://github.com/typst-community/utpm) is used to create package
 
 ## Todo:
-* more aalub cource project functions
-* second toec lab
-* for toec, make R_i and other inputs (and values) with const variable and calculate everything inline, without raw numbers in equations
+* finish aalub cource project
 * make separate dependencies.typ file
 * add licence file
 * publish package

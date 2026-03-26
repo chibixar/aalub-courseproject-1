@@ -4,6 +4,6 @@
 #import "truth-tables.typ": load-csv-tt, draw-truth-table, encode-tt, sort-tt
 #import "map-converters.typ": tt-to-karnaugh, tt-to-veitch
 #import "base-boolean-functions.typ": generate-base-ochs, generate-base-ochu
-#import "formatters.typ": encoding-as-text
+#import "formatters.typ": encoding-as-text, get-mcnf, get-mdnf, generate-boolean-function
 
 #import "title-template.typ" as aalub-course-project-title

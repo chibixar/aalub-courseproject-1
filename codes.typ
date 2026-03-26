@@ -14,4 +14,11 @@
     "3": "01",
 )
 
+// #let code-custom = (
+//     "0": "01",
+//     "1": "10",
+//     "2": "00",
+//     "3": "11",
+// )
+
 // #let code-custom = code-standart // for test

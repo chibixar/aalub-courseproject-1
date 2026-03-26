@@ -4,9 +4,10 @@
 
     = Таблица истинности ОЧУ
 
+    Разряды множимого закодированы: #encoding-as-text(code-custom)
+
     Разряды множителя закодированы: #encoding-as-text(code-standart)
 
-    Разряды множимого закодированы: #encoding-as-text(code-custom)
 
     // ОПРЕДЕЛЯЕМ ПРАВИЛО МАСКИ
     // Для ОЧУ: максимальная цифра множителя - двойка.
@@ -19,16 +20,16 @@
 
     // СХЕМА ЭНКОДЕРА:
     // mh -> code-custom (раскладывается на 2 бита: x1, x2)
-    // mt -> code-custom (раскладывается на 2 бита: y1, y2)
+    // mt -> code-standart (раскладывается на 2 бита: y1, y2)
     // h  -> none        (остается 1 бит: h)
     // p_high -> code-custom (раскладывается на 2 бита: P1, P2)
     // p_low  -> code-custom (раскладывается на 2 бита: P3, P4)
     // comment -> none   (строка)
-    #let schema-ochu = (code-custom, code-custom, none, code-custom, code-custom, none)
+    #let schema-ochu = (code-custom, code-standart, none, code-custom, code-custom, none)
     #let encoded-ochu = encode-tt(raw-ochu, schema-ochu)
 
     // Сортируем: x1 (0), x2 (1), y1 (2), y2 (3), h (4)
-//     #let encoded-ochu = sort-tt(encoded-ochu, sort-cols: (0, 1, 2, 3, 4))
+    #let encoded-ochu = sort-tt(encoded-ochu, sort-cols: (0, 1, 2, 3, 4))
 
     // Отрисовываем таблицу истинности
     #draw-truth-table(
@@ -42,7 +43,7 @@
         headers: (
             table.cell(colspan: 2)[*Мн*],
             table.cell(colspan: 2)[*Мт*],
-            table.cell[*Упрб*],
+            table.cell[*Упр.*],
             table.cell(colspan: 2)[*Старшие\ разряды*],
             table.cell(colspan: 2)[*Младшие\ разряды*],
             table.cell(rowspan: 2)[*Пример операции в четверичной с/с*],
@@ -157,8 +158,7 @@
 
     #align(center)[
         #let groups = (
-            (r: 0, c: 3, w: 2, h: 4, pad: 6pt, color: black),
-            (r: 0, c: 7, w: 1, h: 4, pad: 6pt, color: black),
+            (r: 0, c: 7, w: 2, h: 4, pad: 6pt, color: black),
             (r: 2, c: 0, w: 8, h: 2, pad: 3pt, color: black),
         )
 
@@ -195,7 +195,8 @@
             (r: 0, c: 3, w: 2, h: 4, pad: 4pt, color: black),
             (r: 1, c: 0, w: 4, h: 2, pad: 4pt, color: black),
             (r: 1, c: 5, w: 2, h: 2, pad: 4pt, color: black),
-            (r: 2, c: 7, w: 1, h: 2, pad: 4pt, color: black),
+            (r: 2, c: 7, w: 2, h: 2, pad: 4pt, color: black),
+            (r: 0, c: 0, w: 1, h: 4, pad: 6pt, color: black, dash: "dashed"),
         )
 
         #veitch-map(

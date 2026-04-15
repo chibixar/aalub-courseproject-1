@@ -67,18 +67,35 @@
     }
   }
 
-  // FIX 3: GLOBAL FRACTION PADDING (mimics looser MathType division gaps)
+  // FIX 3: SMART FRACTION PADDING (mimics looser MathType division gaps)
   show math.frac: it => {
-    // Check if we already padded it (prevents infinite loop crash!)
+    // Проверка, чтобы не уйти в бесконечный цикл
     if it.num.func() != pad {
+
+      // ХИТРЫЙ ТРЮК: превращаем структуру числителя/знаменателя в текст (repr)
+      // и проверяем, есть ли внутри них вложенная дробь "frac("
+      let has-nested-n = repr(it.num).contains("frac(")
+      let has-nested-d = repr(it.denom).contains("frac(")
+      // Гибкая настройка отступов:
+      // Если есть вложенная дробь -> раздвигаем сильно (0.6em)
+      // Если это простая дробь -> раздвигаем чуть-чуть (0.15em)
+      let pad-n = if has-nested-n { 0.6em } else { 0.3em }
+      let pad-d = if has-nested-d { 0.6em } else { 0.3em }
+
+      // Оборачиваем в display, чтобы размер цифр 2-го яруса был как у 1-го
+      let n = math.display(it.num)
+      let d = math.display(it.denom)
+
+      // Применяем вычисленные отступы
       math.frac(
-        pad(bottom: 0.3em, it.num), // Push numerator up away from the line
-        pad(top: 0.3em, it.denom) // Push denominator down away from the line
+        pad(bottom: pad-n, n),
+        pad(top: pad-d, d)
       )
     } else {
       it
     }
   }
+
 
   block(breakable: false, width: 100%, [
     #if (receive) [Получаем]
@@ -100,6 +117,14 @@
           = 1.05 "кОм."
   $
 ]
+
+#hide("|")
+
+
+#hide("|")
+
+
+#hide("|")
 
 
 #let V = (

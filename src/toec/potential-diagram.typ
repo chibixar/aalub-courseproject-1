@@ -1,12 +1,13 @@
 #import "@preview/cetz:0.4.2"
-// #import "math-helpers.typ": _fmt // Можно раскомментировать и использовать для форматирования
+#import "math-helpers.typ": _fmt // Можно раскомментировать и использовать для форматирования
 
 #let potential-diagram(
   points,
   width: 14,
   height: 8,
   x-label: $R", Ом"$,
-  y-label: $phi", В"$
+  y-label: $phi", В"$,
+  r-label-pos: "bottom" // По умолчанию все R снизу
 ) = {
   align(center, cetz.canvas({
     import cetz.draw: *
@@ -69,44 +70,55 @@
         // Проекция на ось X
         line((px, py), (px, origin-y), stroke: (dash: "dashed", thickness: 0.5pt, paint: gray))
 
-        // НОВОЕ: Проекция на ось Y + Подпись значения потенциала
-        line((px, py), (origin-x, py), stroke: (dash: "dashed", thickness: 0.5pt, paint: gray))
+        if p.at("show-phi", default: true) {
+            // НОВОЕ: Проекция на ось Y + Подпись значения потенциала
+            line((px, py), (origin-x, py), stroke: (dash: "dashed", thickness: 0.5pt, paint: gray))
 
-        // Форматируем число (меняем точку на запятую). Если используете _fmt, можно заменить на #_fmt(p.phi)
-        let val = str(p.phi).replace(".", ",")
-        content((origin-x, py), anchor: "east", padding: 0.15)[#val]
+            // Форматируем число (меняем точку на запятую). Если используете _fmt, можно заменить на #_fmt(p.phi)
+    //         let val = str(p.phi).replace(".", ",")
+            let val = _fmt(p.phi)
+            content((origin-x, py), anchor: "east", padding: 0.15)[#val]
+        }
       }
     }
 
     // Скобочки для резисторов и подписи ЭДС
     for i in range(points.len() - 1) {
-      let p1 = points.at(i)
-      let p2 = points.at(i+1)
+    let p1 = points.at(i)
+    let p2 = points.at(i+1)
 
-      // Если есть изменение по R - рисуем фигурную скобочку внизу
-      if calc.abs(p2.r - p1.r) > 0.001 {
-         let x1 = tx(p1.r)
-         let x2 = tx(p2.r)
-         let y = origin-y - 0.15 // Отступ вниз от оси X
+    if calc.abs(p2.r - p1.r) > 0.001 {
+       let x1 = tx(p1.r)
+       let x2 = tx(p2.r)
 
-         // НОВОЕ: Рисуем красивую фигурную скобку (underbrace)
-         decorations.brace((x1, y), (x2, y), flip: true, amplitude: 0.25, stroke: 0.8pt)
+       // ОПРЕДЕЛЯЕМ ПОЗИЦИЮ (смотрим в точку p2 или берем общую для функции)
+       let pos = p2.at("r-pos", default: r-label-pos)
 
-         if "r-label" in p2 {
-           // Смещаем текст (R_i) чуть ниже кончика фигурной скобки
-           content(((x1+x2)/2, y - 0.4), anchor: "north", padding: 0.1)[#p2.r-label]
-         }
-      } else {
-         // Для скачков ЭДС можем нарисовать "r" (внутреннее сопротивление)
-         if "r-label" in p2 {
-            let px = tx(p1.r)
-            let y = origin-y - 0.2
-            line((px - 0.15, y), (px + 0.15, y), stroke: 0.5pt)
-            content((px, y), anchor: "north", padding: 0.15)[#p2.r-label]
-         }
-      }
+       let y-brace = 0
+       let y-text = 0
+       let brace-flip = true
+       let text-anchor = "north"
 
-      // Если есть вертикальный скачок - подписываем ЭДС сбоку
+       if pos == "top" {
+         y-brace = ty(max-y) + 0.3 // Чуть выше верхнего края графика
+         y-text = y-brace + 0.4
+         brace-flip = false
+         text-anchor = "south"
+       } else {
+         y-brace = origin-y - 0.15 // Под осью X
+         y-text = y-brace - 0.4
+         brace-flip = true
+         text-anchor = "north"
+       }
+
+       // Рисуем фигурную скобку
+       decorations.brace((x1, y-brace), (x2, y-brace), flip: brace-flip, amplitude: 0.25, stroke: 0.8pt)
+
+       if "r-label" in p2 {
+         content(((x1+x2)/2, y-text), anchor: text-anchor, padding: 0.1)[#p2.r-label]
+       }
+
+       // Если есть вертикальный скачок - подписываем ЭДС сбоку
       if calc.abs(p2.phi - p1.phi) > 0.001 and calc.abs(p2.r - p1.r) < 0.001 {
          let mid-y = ty((p1.phi + p2.phi) / 2)
          let px = tx(p1.r)
@@ -115,7 +127,7 @@
            content((px, mid-y), anchor: align, padding: 0.2)[#p2.e-label]
          }
       }
-    }
+    }}
   }))
 }
 
@@ -124,8 +136,8 @@
     (r: 0,   phi: 0,     label: [г], anchor: "south-east"),
     (r: 1.0, phi: 3.40,  label: [д], anchor: "south-east", r-label: $R_6$),
     (r: 1.0, phi: 18.40, label: [e], anchor: "south", e-label: move(dy: 1.3em, $E_1$)),
-    (r: 4.9, phi: 11.26, label: [a], anchor: "south", r-label: $R_1$),
-    (r: 6.1, phi: 15.34, label: [б], anchor: "south", r-label: $R_2$),
+    (r: 4.9, phi: 11.26123123123, label: [a], anchor: "south", r-label: $R_1$),
+    (r: 6.1, phi: 15.34, label: [б], anchor: "south", r-label: $R_2$, show-phi: false),
     (r: 8.1, phi: 30.00, label: [в], anchor: "south", r-label: $R_3$),
     (r: 8.1, phi: 0,     anchor: "south-west", e-label: $E_3$),
   ))

@@ -33,6 +33,10 @@ I used:
 * circuits: [zap](https://github.com/l0uisgrange/zap), [documentation](https://zap.grangelouis.ch/#decorations)
 * diagrams + circuits: [cetz](https://github.com/cetz-package/cetz), [documentation](https://cetz-package.github.io/docs/getting-started)
 
+[//]: # (* math &#40;matrix operations&#41;: [numty]&#40;https://github.com/PabloRuizCuevas/numty&#41;)
+
+[//]: # (* latex inside typst &#40;hehe&#41;: [mitex]https://github.com/mitex-rs/mitex&#41;)
+
 ## Also thanks to:
 
 * [typst](https://github.com/typst/typst) for making this possible

@@ -13,16 +13,32 @@
   cols: 4,
   is-dnf: true     // true = МДНФ, false = МКНФ
 ) = {
+
+  // 0. Группируем контуры по полю `id`.
+  // Если у контуров одинаковый `id`, они станут одной импликантой.
+  // Если `id` нет, используем уникальный индекс (поведение по умолчанию).
+  let logical-groups = (:)
+  for (i, g) in groups.enumerate() {
+    let key = str(g.at("id", default: i))
+    if key not in logical-groups {
+      logical-groups.insert(key, ())
+    }
+    logical-groups.at(key).push(g)
+  }
+
   let terms = ()
 
-  for g in groups {
-    // 1. Собираем все координаты (r, c), которые покрывает эта группа (с учетом заворота карты)
+  // Итерируемся по сгруппированным логическим контурам
+  for (_, sub-groups) in logical-groups {
+    // 1. Собираем все координаты (r, c), со ВСЕХ частей этой группы
     let covered-cells = ()
-    for r-idx in range(g.h) {
-      let r = calc.rem(g.r + r-idx, rows)
-      for c-idx in range(g.w) {
-        let c = calc.rem(g.c + c-idx, cols)
-        covered-cells.push((r: r, c: c))
+    for g in sub-groups {
+      for r-idx in range(g.h) {
+        let r = calc.rem(g.r + r-idx, rows)
+        for c-idx in range(g.w) {
+          let c = calc.rem(g.c + c-idx, cols)
+          covered-cells.push((r: r, c: c))
+        }
       }
     }
 
@@ -76,7 +92,7 @@
     }
   }
 
-  // 4. Собираем итоговое выражение
+  // 4. Собираем итоговое выражение 
   if terms.len() == 0 {
      return if is-dnf { $0$ } else { $1$ }
   }

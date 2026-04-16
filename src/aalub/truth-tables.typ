@@ -58,12 +58,14 @@
 ) = {
   let cols = rows.at(0).len()
 
-  let all_cols_count = cols + 1 + int(show-numbers)
-  let all_rows_count = rows.len() + 1 + header_rows
+  // Возможных позиций для вертикальных линий ровно cols + 1 (от 0 до cols)
+  let max_vlines = cols + 1 
+  // Возможных позиций для горизонтальных линий
+  let max_hlines = rows.len() + header_rows + int(show-numbers) + 1
 
   // Генерируем жирные вертикальные и горизонтальные линии
-  let vlines = bold-vlines.map(x => table.vline(x: calc.rem(x + all_cols_count, all_cols_count), stroke: 1.5pt + black))
-  let hlines = bold-hlines.map(y => table.hline(y: calc.rem(y + all_rows_count, all_rows_count), stroke: 1.5pt + black))
+  let vlines = bold-vlines.map(x => table.vline(x: calc.rem(x + max_vlines, max_vlines), stroke: 1.5pt + black))
+  let hlines = bold-hlines.map(y => table.hline(y: calc.rem(y + max_hlines, max_hlines), stroke: 1.5pt + black))
 
   // Генерируем строку 1, 2, 3...
   let num-row = ()

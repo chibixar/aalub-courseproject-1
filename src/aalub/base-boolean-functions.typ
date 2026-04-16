@@ -65,3 +65,43 @@
   }
   return rows
 }
+
+
+// ГЕНЕРАТОР БАЗОВЫХ СТРОК ДЛЯ ОЧУС (Умножитель-сумматор)
+// Генерирует массив: (p1_in, mh, mt, h, p_out, q, "комментарий")
+#let generate-base-ochus(mask-fn: none) = {
+  let rows = ()
+  for p1_in in (0, 1) {             // Входной перенос
+    for mh in (0, 1, 2, 3) {        // Множимое
+      for mt in (0, 1, 2, 3) {      // Множитель
+        for h in (0, 1) {           // Управляющий вход
+          
+          // Логика ОЧУС
+          let result = if h == 0 { mh * mt + p1_in } else { mh }
+
+          let p_out = calc.quo(result, 4) // Выходной перенос
+          let q = calc.rem(result, 4)     // Результат
+
+          let p_out_str = str(p_out)
+          let q_str = str(q)
+
+          // Комментарий (как в методичке)
+          let comment = if h == 0 {
+            str(mh) + "·" + str(mt) + "+" + str(p1_in) + "=" + str(p_out) + str(q)
+          } else {
+            "Выход – код «0" + str(mh) + "»"
+          }
+
+          // Применяем маску
+          if mask-fn != none and mask-fn(p1_in, mh, mt, h) {
+            p_out_str = "x"
+            q_str = "x"
+          }
+
+          rows.push((str(p1_in), str(mh), str(mt), str(h), p_out_str, q_str, comment))
+        }
+      }
+    }
+  }
+  return rows
+}

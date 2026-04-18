@@ -3,6 +3,18 @@
 #let pm-table(body) = [
     = Таблица истинности ПМ
 
+    // 1. ОПРЕДЕЛЯЕМ ВАШУ КАСТОМНУЮ КОДИРОВКУ
+    #let code-pm-custom = (
+        "0": "10",
+        "1": "00",
+        "2": "01",
+        "3": "11",
+    )
+
+    Входные разряды множителя закодированы: #encoding-as-text(code-pm-custom)
+
+    Выходные разряды закодированы: #encoding-as-text(code-standart)
+
     // Генератор сырых данных для ПМ
     #let raw-pm = {
         let res = ()
@@ -17,7 +29,7 @@
 
                 res.push((
                     str(input), str(p_in), str(p_out), str(sign), str(out),
-                    str(input) + " + " + str(p_out)
+                    str(input) + " + " + str(p_in)
                         + " -> " + if sign == 1 {"-"} else {""} + str(out) + " | " + str(p_out)
                 ))
             }
@@ -25,7 +37,8 @@
         res
     }
 
-    #let schema-pm = (code-standart, none, none, none, code-standart, none)
+    // 2. МЕНЯЕМ СХЕМУ (первый столбец теперь code-pm-custom)
+    #let schema-pm = (code-pm-custom, none, none, none, code-standart, none)
     #let encoded-pm = encode-tt(raw-pm, schema-pm)
 
     #draw-truth-table(
@@ -50,6 +63,7 @@
 
     // ОПРЕДЕЛЯЕМ ПРАВИЛА (для конвертера mdnf/mcnf)
     // Карта 2x4. Переменные: v1 v2 (cols), c_in (rows)
+    // Правила остаются прежними, так как структура карты неизменна (оси Карно те же)
     #let pm-vars-map = (
         (c: (2, 3)),       // v1 (колонки 11 и 10)
         (c: (1, 2)),       // v2 (колонки 01 и 11)
@@ -64,7 +78,8 @@
         gray-code(2), gray-code(1), vars-labels,
         pm-vars-map, ($v_1$, $v_2$, $П_(i-1)$),
         (
-            (r: 1, c: 0, w: 4, h: 1, pad: 4pt, color: black),
+            // Новая группа охватывает ровно столбцы "01" (2) и "11" (3)
+            (r: 0, c: 1, w: 2, h: 2, pad: 4pt, color: black),
         ),
         $П_i$
     )
@@ -75,8 +90,8 @@
         gray-code(2), gray-code(1), vars-labels,
         pm-vars-map, ($v_1$, $v_2$, $П_(i-1)$),
         (
-            (r: 1, c: 3, w: 2, h: 1, pad: 6pt, color: black, dash: "dashed"),
-            (r: 1, c: 0, w: 2, h: 1, pad: 4pt, color: black),
+            (r: 0, c: 1, w: 1, h: 2, pad: 4pt, color: black),
+            (r: 0, c: 1, w: 2, h: 1, pad: 6pt, color: black, dash: "dashed"),
         ),
         $S$
     )
@@ -87,8 +102,9 @@
         gray-code(2), gray-code(1), vars-labels,
         pm-vars-map, ($v_1$, $v_2$, $П_(i-1)$),
         (
+            // Изолированные единицы для P1 при новой кодировке
             (r: 1, c: 0, w: 1, h: 1, pad: 4pt, color: black),
-            (r: 0, c: 2, w: 1, h: 1, pad: 4pt, color: black),
+            (r: 0, c: 1, w: 1, h: 1, pad: 4pt, color: black),
         ),
         $P_1$
     )
@@ -99,8 +115,11 @@
         gray-code(2), gray-code(1), vars-labels,
         pm-vars-map, ($v_1$, $v_2$, $П_(i-1)$),
         (
-            (r: 0, c: 1, w: 1, h: 2, pad: 4pt, color: black),
-            (r: 0, c: 3, w: 1, h: 2, pad: 4pt, color: black),
+            // Идеальная "шахматка" единиц
+            (r: 0, c: 0, w: 1, h: 1, pad: 4pt, color: black),
+            (r: 0, c: 2, w: 1, h: 1, pad: 4pt, color: black),
+            (r: 1, c: 1, w: 1, h: 1, pad: 4pt, color: black),
+            (r: 1, c: 3, w: 1, h: 1, pad: 4pt, color: black),
         ),
         $P_2$
     )

@@ -1,0 +1,23 @@
+[package]
+name = "typst-bsuir-core"
+version = "1.0.3"
+entrypoint = "main.typ"
+authors = ["Slavita"]
+license = "Unlicense"
+description = ""
+homepage = ""
+repository = ""
+keywords = [
+    "bsuir",
+    "gost",
+]
+compiler = "0.14.2"
+exclude = [
+    ".github",
+    "docs",
+    "tests",
+    "assets",
+    ".git",
+]
+
+[tool.utpm]
